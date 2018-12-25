@@ -12,7 +12,7 @@ walletValidator = ValidatorScript $ Ledger.fromCompiledCode
                   $$(PlutusTx.compile
                      [||
                      -- Due to what appears to be a bug we cannot use emptyValidator currently. The compiler seems to need the input types explicitly defined even if not used.
-                      \(d :: ()) (r :: ()) (v :: ()) -> ()
+                      \(r :: ()) (d :: ()) (v :: ()) -> ()
                       ||])
 
 scAddress :: Address'
@@ -24,9 +24,9 @@ deposit val = payToScript_ scAddress val Ledger.unitData
 withdraw :: MockWallet ()
 withdraw = collectFromScript walletValidator Ledger.unitRedeemer
 
-registerWallet :: MockWallet ()
-registerWallet = startWatching scAddress
+watchSCWallet :: MockWallet ()
+watchSCWallet = startWatching scAddress
 
-$(mkFunction 'registerWallet)
+$(mkFunction 'watchSCWallet)
 $(mkFunction 'deposit)
 $(mkFunction 'withdraw)
