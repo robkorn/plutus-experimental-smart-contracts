@@ -15,11 +15,6 @@ lotteryValidator = ValidatorScript $ Ledger.fromCompiledCode $ $$(PlutusTx.compi
   [||
     \(ticket :: [Int]) (winningNums :: [Int]) (p :: PendingTx') ->
       let
-        fst :: (a, b) -> a
-        fst (a, b) = a
-
-        snd :: (a, b) -> b
-        snd (a, b) = b
 
         isNumWinner :: Int -> Bool
         isNumWinner n = $$(P.foldr) (\i acc -> $$(P.or) acc (Builtins.equalsInteger i n)) False winningNums
