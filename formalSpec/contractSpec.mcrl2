@@ -1,0 +1,37 @@
+
+
+sort WalletStates = struct WalletStates(w1: Nat, w2: Nat, scW: Nat);
+
+act payToScript : Nat;
+	  collectFromScript : Nat;
+
+% Payment Functions
+map w1PayToScriptFn : Nat # WalletStates -> WalletStates;
+var n : Nat, ws : WalletStates;
+eqn w1PayToScriptFn(n, ws) = WalletStates(Int2Nat(w1(ws)-n), w2(ws), scW(ws)+n);
+
+map w2PayToScriptFn : Nat # WalletStates -> WalletStates;
+var n : Nat, ws : WalletStates;
+eqn w2PayToScriptFn(n, ws) = WalletStates(w1(ws), Int2Nat(w2(ws)-n), scW(ws)+n);
+
+
+% Collect Functions
+map w1CollectFromScriptFn : WalletStates -> WalletStates;
+var ws : WalletStates;
+eqn w1CollectFromScriptFn(ws) = WalletStates(w1(ws) + scW(ws), w2(ws), 0);
+
+map w2CollectFromScriptFn : WalletStates -> WalletStates;
+var ws : WalletStates;
+eqn w2CollectFromScriptFn(ws) = WalletStates(w1(ws), w2(ws)  + scW(ws), 0);
+
+proc
+  start(ws:WalletStates) = (w1(ws) > 0) -> w1Pay(ws) + (scW(ws) > 0) -> (w1Collect(ws) + w2Collect(ws))
+                                        + (w2(ws) > 0) -> w2Pay(ws);
+  w1Pay(ws:WalletStates) = payToScript(1) . start(w1PayToScriptFn(1, ws));
+  w2Pay(ws:WalletStates) = payToScript(2) . start(w2PayToScriptFn(1, ws));
+
+  w1Collect(ws:WalletStates) = collectFromScript(1) . start(w1CollectFromScriptFn(ws));
+  w2Collect(ws:WalletStates) = collectFromScript(2) . start(w2CollectFromScriptFn(ws));
+
+init
+  start(WalletStates(1, 1, 0));
