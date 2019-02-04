@@ -1,0 +1,4 @@
+% No deadlocks
+[true*]<true> true &&
+
+[true*] <payToScript(1)> true
